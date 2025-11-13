@@ -5,9 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:all": "node script/devAll.js",
     "build": "tsc && vite build",
-    "build:no-typecheck": "vite build",
     "preview": "vite preview",
     "tauri": "tauri"
   },

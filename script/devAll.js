@@ -1,18 +1,20 @@
 import { spawn } from "child_process";
 import { watch } from "fs";
+import { APP_CWD, APP_WEB_UI } from "./constants.js";
 const DELAY = 500;
-const CWD = process.cwd() + "/app";
 
-let child;
-let timeout;
+(async () => {
+  let child;
+  let timeout;
 
-spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: CWD });
+  await spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: APP_CWD });
 
-watch("./app/src", { recursive: true }, () => {
-  clearTimeout(timeout);
+  await watch("app/web-ui/src", { recursive: true }, () => {
+    clearTimeout(timeout);
 
-  timeout = setTimeout(() => {
-    if (child && !child.killed) child.kill();
-    child = spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: CWD });
-  }, DELAY);
-});
+    timeout = setTimeout(() => {
+      if (child && !child.killed) child.kill();
+      child = spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: APP_WEB_UI });
+    }, DELAY);
+  });
+})();

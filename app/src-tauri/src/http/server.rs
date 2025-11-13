@@ -34,7 +34,7 @@ pub async fn start_server(port: u16) -> &'static str {
 
     rocket::custom(&config)
         .mount("/", routes![down, get_entries])
-        .mount("/", FileServer::from(relative!("../dist")))
+        .mount("/", FileServer::from(relative!("../web-ui/webapp")))
         .launch()
         .await
         .expect("Failed to start the server!!!");
