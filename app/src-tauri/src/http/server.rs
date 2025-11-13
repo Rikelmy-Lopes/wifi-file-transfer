@@ -1,20 +1,9 @@
-use local_ip_address::local_ip;
-use std::net::IpAddr;
-
-use rocket::fs::{relative, FileServer};
-use rocket::{get, routes, Config, Shutdown};
-
 use crate::fs::fs::get_dir_entries;
-
-include!("../utils/os.rs");
-
-#[get("/down?<password>")]
-fn down(password: &str, shutdown: Shutdown) -> &'static str {
-    if password == "8910" {
-        shutdown.notify();
-    }
-    "ShoutDown"
-}
+use crate::state::state::APP_STATE;
+use local_ip_address::local_ip;
+use rocket::fs::{relative, FileServer};
+use rocket::{get, routes, Config};
+use std::net::IpAddr;
 
 #[get("/entries")]
 fn get_entries() -> String {
@@ -24,7 +13,7 @@ fn get_entries() -> String {
 }
 
 #[tauri::command]
-pub async fn start_server(port: u16) -> &'static str {
+pub async fn start_server(port: u16) -> () {
     let ip = get_current_ip();
 
     let config = Config {
@@ -33,14 +22,35 @@ pub async fn start_server(port: u16) -> &'static str {
         ..Config::debug_default()
     };
 
-    rocket::custom(&config)
-        .mount("/", routes![down, get_entries])
+    let result = rocket::custom(&config)
+        .mount("/", routes![get_entries])
         .mount("/", FileServer::from(relative!("../web-ui/webapp")))
-        .launch()
-        .await
-        .expect("Failed to start the server!!!");
+        .ignite()
+        .await;
 
-    return "Started";
+    let rocket = match result {
+        Ok(rocket) => rocket,
+        Err(e) => {
+            eprintln!("❌ Erro ao inicializar o Rocket: {}", e);
+            return ();
+        }
+    };
+
+    {
+        let mut state = APP_STATE.lock().unwrap();
+        state.shutdown = Some(rocket.shutdown());
+    }
+
+    let _ = rocket.launch().await;
+}
+
+#[tauri::command]
+pub fn stop_server() -> () {
+    let state = APP_STATE.lock().unwrap();
+
+    if let Some(shutdown) = state.shutdown.as_ref() {
+        shutdown.clone().notify();
+    }
 }
 
 #[tauri::command]

@@ -5,6 +5,7 @@ use std::{
 };
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct File {
     name: String,
     path: String,

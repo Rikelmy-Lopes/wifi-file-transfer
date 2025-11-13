@@ -5,12 +5,7 @@ export const startServer = () => {
 };
 
 export const stopServer = async () => {
-  const ip = await getIp();
-  try {
-    await fetch(`http://${ip}:1234/down?password=${8910}`);
-  } catch (e) {
-    console.log(e);
-  }
+  invoke("stop_server");
 };
 
 export const getIp = async () => {
