@@ -7,6 +7,8 @@ const DELAY = 500;
   let child;
   let timeout;
 
+  await spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: APP_WEB_UI });
+
   await spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: APP_CWD });
 
   await watch("app/web-ui/src", { recursive: true }, () => {

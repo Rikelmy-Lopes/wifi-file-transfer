@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "install": "node ./script/install.js",
-    "dev:all": "node ./script/devAll.js"
+    "dev:all": "node ./script/devAll.js",
+    "clean:all": "node ./script/cleanAll.js"
   },
   "author": "",
   "license": "MIT"
