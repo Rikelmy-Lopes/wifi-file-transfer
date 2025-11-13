@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::{
+    env::home_dir,
     fs::{self, FileType},
     path::PathBuf,
 };
@@ -27,7 +28,7 @@ fn is_dir(dir: String) -> bool {
 }
 
 pub fn get_dir_entries() -> Vec<File> {
-    let paths = fs::read_dir("/home/rikelmy").unwrap();
+    let paths = fs::read_dir(home_dir().unwrap()).unwrap();
     let mut files: Vec<File> = Vec::new();
 
     for path in paths {

@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    tets_lib::run()
+    wifi_file_transfer_lib::run()
 }

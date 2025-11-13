@@ -1,4 +1,4 @@
-use local_ip_address::linux::local_ip;
+use local_ip_address::local_ip;
 use std::net::IpAddr;
 
 use rocket::fs::{relative, FileServer};
