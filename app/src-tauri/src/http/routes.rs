@@ -18,9 +18,9 @@ pub async fn get_entries() -> impl IntoResponse {
     return json;
 }
 
-pub async fn root() -> &'static str {
+/* pub async fn root() -> &'static str {
     "Hello, World!"
-}
+} */
 
 pub async fn download2(
     range: Option<TypedHeader<Range>>,

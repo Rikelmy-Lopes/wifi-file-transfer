@@ -1,4 +1,5 @@
-use crate::http::routes::{download, download2, get_entries, root};
+use crate::http::routes::{download, download2, get_entries};
+use crate::state::app_state::AppState;
 use crate::utils::os::get_current_ip;
 
 use axum::http::StatusCode;
@@ -6,15 +7,21 @@ use axum::routing::{get, get_service};
 use axum::Router;
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
+use tauri::{AppHandle, Manager};
 use tokio::sync::oneshot;
 use tower_http::services::ServeDir;
 
 static STOP_TX: Lazy<Mutex<Option<oneshot::Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
 #[tauri::command]
-pub async fn start_server(port: u16) -> () {
-    let ip = get_current_ip();
+pub async fn start_server(app: AppHandle, port: u16) -> () {
     let (tx, rx) = oneshot::channel::<()>();
+    let state = app.state::<Mutex<AppState>>();
+    {
+        let mut guard = state.lock().unwrap();
+        guard.server_port = port;
+        guard.server_ip = get_current_ip();
+    }
 
     *STOP_TX.lock().unwrap() = Some(tx);
 
@@ -27,7 +34,7 @@ pub async fn start_server(port: u16) -> () {
                 .handle_error(|_| async { StatusCode::INTERNAL_SERVER_ERROR }),
         );
 
-    let url = format!("{}:{}", ip, port);
+    let url = format!("{}:{}", state.lock().unwrap().server_ip, port);
 
     println!("Server running on: http://{}", url);
 
