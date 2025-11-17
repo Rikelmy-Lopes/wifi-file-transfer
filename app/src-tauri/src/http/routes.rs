@@ -3,6 +3,8 @@ use axum::body::Body;
 use axum::extract::Query;
 use axum::http::{header, HeaderValue, Response, StatusCode};
 use axum::response::IntoResponse;
+use axum::routing::get;
+use axum::Router;
 use axum_extra::headers::Range;
 use axum_extra::TypedHeader;
 use axum_range::{KnownSize, Ranged};
@@ -10,7 +12,10 @@ use std::collections::HashMap;
 use tokio::fs::{self, File};
 use tokio_util::io::ReaderStream;
 
-pub async fn get_entries() -> impl IntoResponse {
+type RangeDownload = Option<TypedHeader<Range>>;
+type QueryParams = Query<HashMap<String, String>>;
+
+async fn get_entries() -> impl IntoResponse {
     let files = get_dir_entries();
 
     let json = serde_json::to_string(&files).unwrap();
@@ -18,15 +23,8 @@ pub async fn get_entries() -> impl IntoResponse {
     return json;
 }
 
-/* pub async fn root() -> &'static str {
-    "Hello, World!"
-} */
-
-pub async fn download2(
-    range: Option<TypedHeader<Range>>,
-    Query(params): Query<HashMap<String, String>>,
-) -> impl IntoResponse {
-    let file = match File::open("C:\\Users\\Rikelmy\\Coding\\testee.zip").await {
+async fn download2(range: RangeDownload, Query(params): QueryParams) -> impl IntoResponse {
+    let file = match File::open("C:\\Users\\SI30\\Coding\\testee.zip").await {
         Ok(f) => f,
         Err(err) => {
             return (StatusCode::NOT_FOUND, format!("File not found: {}", err)).into_response()
@@ -59,7 +57,7 @@ pub async fn download2(
         .into_response()
 }
 
-pub async fn download() -> impl IntoResponse {
+async fn download() -> impl IntoResponse {
     let path = "C:\\Users\\SI30\\Coding\\SIGP_INT.jar";
 
     let metadata = match fs::metadata(path).await {
@@ -96,4 +94,11 @@ pub async fn download() -> impl IntoResponse {
     );
 
     Ok(response)
+}
+
+pub fn set_routes() -> Router<()> {
+    Router::new()
+        .route("/download", get(download))
+        .route("/entries", get(get_entries))
+        .route("/file", get(download2))
 }

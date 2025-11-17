@@ -1,10 +1,9 @@
-use crate::http::routes::{download, download2, get_entries};
+use crate::http::routes::set_routes;
 use crate::state::app_state::AppState;
 use crate::utils::os::get_current_ip;
 
 use axum::http::StatusCode;
-use axum::routing::{get, get_service};
-use axum::Router;
+use axum::routing::get_service;
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager};
@@ -13,7 +12,7 @@ use tower_http::services::ServeDir;
 
 static STOP_TX: Lazy<Mutex<Option<oneshot::Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
-#[tauri::command]
+#[tauri::command(async)]
 pub async fn start_server(app: AppHandle, port: u16) -> () {
     let (tx, rx) = oneshot::channel::<()>();
     let state = app.state::<Mutex<AppState>>();
@@ -25,26 +24,31 @@ pub async fn start_server(app: AppHandle, port: u16) -> () {
 
     *STOP_TX.lock().unwrap() = Some(tx);
 
-    let app = Router::new()
-        .route("/download", get(download))
-        .route("/entries", get(get_entries))
-        .route("/file", get(download2))
-        .fallback_service(
-            get_service(ServeDir::new("../web-ui/webapp"))
-                .handle_error(|_| async { StatusCode::INTERNAL_SERVER_ERROR }),
-        );
+    let router = set_routes().fallback_service(
+        get_service(ServeDir::new("../web-ui/webapp"))
+            .handle_error(|_| async { StatusCode::INTERNAL_SERVER_ERROR }),
+    );
 
-    let url = format!("{}:{}", state.lock().unwrap().server_ip, port);
+    let addr = format!("{}:{}", state.lock().unwrap().server_ip, port);
 
-    println!("Server running on: http://{}", url);
+    let listener = match tokio::net::TcpListener::bind(&addr).await {
+        Ok(listener) => {
+            println!("Server running on: http://{}", addr);
+            listener
+        }
+        Err(e) => {
+            println!("{}", format!("Error starting server! {}", e));
+            return ();
+        }
+    };
 
-    let listener = tokio::net::TcpListener::bind(url).await.unwrap();
-
-    let server = axum::serve(listener, app).with_graceful_shutdown(async {
+    let server = axum::serve(listener, router).with_graceful_shutdown(async {
         rx.await.ok();
     });
 
-    server.await.unwrap()
+    if let Err(e) = server.await {
+        println!("Server error: {}", e);
+    }
 }
 
 #[tauri::command]
