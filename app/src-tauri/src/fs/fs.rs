@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 use std::{
-    env::home_dir,
     fs::{self, FileType},
+    path::PathBuf,
 };
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct File {
+pub struct Entry {
     name: String,
     path: String,
     filetype: String,
@@ -25,14 +25,22 @@ fn get_file_type(file: FileType) -> String {
     }
 }
 
-pub fn get_dir_entries() -> Vec<File> {
-    let paths = fs::read_dir(home_dir().unwrap()).unwrap();
-    let mut files: Vec<File> = Vec::new();
+pub fn get_file_name(path: &str) -> String {
+    let path_buf = PathBuf::from(path);
+
+    return path_buf.file_name().unwrap().to_str().unwrap().to_string();
+}
+
+pub fn get_dir_entries(path: &str) -> Vec<Entry> {
+    let path = PathBuf::from(path).join("Coding");
+
+    let paths = fs::read_dir(path).unwrap();
+    let mut files: Vec<Entry> = Vec::new();
 
     for path in paths {
         let dir_entry = path.unwrap();
         let file_type = dir_entry.file_type().unwrap();
-        files.push(File {
+        files.push(Entry {
             name: dir_entry.file_name().to_str().unwrap().to_owned(),
             path: dir_entry.path().to_str().unwrap().to_owned(),
             filetype: get_file_type(dir_entry.file_type().unwrap()),
