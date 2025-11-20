@@ -4,3 +4,4 @@ const CWD = process.cwd();
 
 export const APP_CWD = join(CWD, "app");
 export const APP_WEB_UI = join(APP_CWD, "web-ui");
+export const APP_WEB_UI_WEBAPP = join(APP_WEB_UI, "webapp")

@@ -1,17 +1,21 @@
 import { spawn } from "child_process";
-import { watch } from "fs";
-import { APP_CWD, APP_WEB_UI } from "./constants.js";
+import { watch, access } from "fs/promises";
+import { APP_CWD, APP_WEB_UI, APP_WEB_UI_WEBAPP } from "./constants.js";
 const DELAY = 500;
 
 (async () => {
   let child;
   let timeout;
 
-  await spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: APP_WEB_UI });
+  try {
+    await access(APP_WEB_UI_WEBAPP);
+  } catch (_) {
+    spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: APP_WEB_UI });
+  }
+  
+  spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: APP_CWD });
 
-  await spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: APP_CWD });
-
-  await watch("app/web-ui/src", { recursive: true }, () => {
+  watch("app/web-ui/src", { recursive: true }, () => {
     clearTimeout(timeout);
 
     timeout = setTimeout(() => {
