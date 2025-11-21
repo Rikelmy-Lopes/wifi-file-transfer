@@ -9,13 +9,24 @@ use axum_extra::TypedHeader;
 use axum_range::{KnownSize, Ranged};
 use std::collections::HashMap;
 use std::env::home_dir;
+use std::path::PathBuf;
 use tokio::fs::File;
 
 type RangeDownload = Option<TypedHeader<Range>>;
 type QueryParams = Query<HashMap<String, String>>;
 
-async fn get_entries() -> impl IntoResponse {
-    let files = get_dir_entries(home_dir().unwrap().to_str().unwrap());
+async fn get_entries(Query(params): QueryParams) -> impl IntoResponse {
+    let path = params.get("path");
+
+    if path.is_none() {
+        let files = get_dir_entries(PathBuf::from(home_dir().unwrap().to_str().unwrap()));
+
+        let json = serde_json::to_string(&files).unwrap();
+
+        return json;
+    }
+
+    let files = get_dir_entries(PathBuf::from(path.unwrap()));
 
     let json = serde_json::to_string(&files).unwrap();
 

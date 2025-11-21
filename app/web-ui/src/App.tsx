@@ -1,17 +1,24 @@
 import axios from "axios";
 import "./App.css";
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useRef, useState, type JSX } from "react";
 import type { IEntry } from "./types/fs";
+import { BrowserHistory } from "./utils/BrowserHistory";
 
 function App() {
   const [entries, setEntries] = useState<IEntry[]>([]);
+  const [path, setPath] = useState<string | null>(null);
+  const historyRef = useRef(new BrowserHistory());
+  const browserHistory = historyRef.current;
+
+  async function fetchEntries() {
+    const url = path != null ? `/entries?path=${encodeURIComponent(path)}` : "/entries";
+    let { data } = await axios.get<IEntry[]>(url);
+    setEntries(data);
+  }
 
   useEffect(() => {
-    (async () => {
-      let { data } = await axios.get<IEntry[]>("/entries");
-      setEntries(data);
-    })();
-  }, []);
+    fetchEntries();
+  }, [path]);
 
   function renderEntryList() {
     const elements: JSX.Element[] = [];
@@ -28,7 +35,7 @@ function App() {
       } else {
         element = (
           <div>
-            <p>{entry.name}</p>
+            <p onClick={() => setPath(browserHistory.visit(entry.path))}> {entry.name} </p>
           </div>
         );
       }
@@ -41,7 +48,12 @@ function App() {
 
   return (
     <>
-      <div>{renderEntryList()}</div>
+      <div>
+        <p>Caminho atual: {path}</p>
+        <button onClick={() => setPath(browserHistory.back())}>Voltar</button>
+        <button onClick={() => setPath(browserHistory.forward())}>Frente</button>
+        <div>{renderEntryList()}</div>
+      </div>
     </>
   );
 }
