@@ -15,12 +15,14 @@ const DELAY = 500;
   
   spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: APP_CWD });
 
-  watch("app/web-ui/src", { recursive: true }, () => {
+  let watcher = watch("app/web-ui/src", { recursive: true });
+
+  for await (const _ of watcher) {
     clearTimeout(timeout);
 
     timeout = setTimeout(() => {
       if (child && !child.killed) child.kill();
       child = spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: APP_WEB_UI });
     }, DELAY);
-  });
+  }
 })();

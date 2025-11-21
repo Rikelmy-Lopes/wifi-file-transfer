@@ -32,7 +32,7 @@ pub fn get_file_name(path: &str) -> String {
 }
 
 pub fn get_dir_entries(path: &str) -> Vec<Entry> {
-    let path = PathBuf::from(path).join("Coding");
+    let path = PathBuf::from(path).join("Downloads");
 
     let paths = fs::read_dir(path).unwrap();
     let mut files: Vec<Entry> = Vec::new();
