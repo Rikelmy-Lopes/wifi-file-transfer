@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { startServer, stopServer } from "./utils/server";
-import { AppState, getAppState } from "./state/appstate";
+import { AppState, getAppState } from "./state/appState";
 
 function App() {
   const [appState, setAppState] = useState<AppState | null>(null);

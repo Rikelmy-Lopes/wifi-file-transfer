@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react-swc";
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: "webapp",
+    outDir: "../src-tauri/resources/webapp",
+    emptyOutDir: true,
   },
 });

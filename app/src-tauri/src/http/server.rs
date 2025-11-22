@@ -24,8 +24,13 @@ pub async fn start_server(app: AppHandle, port: u16) -> () {
 
     *STOP_TX.lock().unwrap() = Some(tx);
 
+    let webapp_path = {
+        let state = state.lock().unwrap();
+        state.webapp_path.clone()
+    };
+
     let router = set_routes().fallback_service(
-        get_service(ServeDir::new("../web-ui/webapp"))
+        get_service(ServeDir::new(webapp_path))
             .handle_error(|_| async { StatusCode::INTERNAL_SERVER_ERROR }),
     );
 
