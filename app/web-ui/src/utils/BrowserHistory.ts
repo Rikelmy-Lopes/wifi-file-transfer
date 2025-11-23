@@ -1,37 +1,71 @@
+class Node {
+  public data: string;
+  public prev: Node | null;
+  public next: Node | null;
+
+  constructor(data: string) {
+    this.data = data;
+    this.prev = null;
+    this.next = null;
+  }
+}
+
 export class BrowserHistory {
-  private stack: string[];
-  private index: number;
+  private curr: Node;
 
-  constructor() {
-    this.stack = []; // visited URLs
-    this.index = -1; // current position in stack
+  constructor(homepage: string) {
+    this.curr = new Node(homepage);
   }
 
+  // Function to visit a new URL
   visit(url: string) {
-    if (this.index < this.stack.length - 1) {
-      const start = this.index + 1;
-      const count = this.stack.length - start;
-      this.stack.splice(start, count);
+    // Create a node for this visit
+    const urlNode = new Node(url);
+
+    // Set the previous node of the
+    // new node to current
+    urlNode.prev = this.curr;
+
+    // Update the next of the current
+    // node to the new node
+    this.curr.next = urlNode;
+
+    // Move the current pointer to the new node
+    this.curr = urlNode;
+    return this.curr.data;
+  }
+
+  // Function to move back by 'step' times
+  back(step: number) {
+    // Pointer to traverse backward
+    let trav = this.curr;
+
+    // Travel back `step` times if possible
+    while (trav.prev !== null && step > 0) {
+      trav = trav.prev;
+      step--;
     }
-    this.stack.push(url);
-    this.index = this.stack.length - 1;
-    return this.current();
+
+    // Update current pointer after moving back
+    this.curr = trav;
+
+    return this.curr.data;
   }
 
-  back() {
-    if (this.index === -1) return this.current();
+  // Function to move forward by 'step' times
+  forward(step: number) {
+    // Pointer to traverse forward
+    let trav = this.curr;
 
-    this.index = Math.max(-1, this.index - 1);
-    return this.current();
-  }
+    // Travel forward `step` times if possible
+    while (trav.next !== null && step > 0) {
+      trav = trav.next;
+      step--;
+    }
 
-  forward() {
-    if (this.index >= this.stack.length - 1) return this.current();
-    this.index = Math.min(this.stack.length - 1, this.index + 1);
-    return this.current();
-  }
+    // Update current pointer after moving forward
+    this.curr = trav;
 
-  current() {
-    return this.index === -1 ? null : this.stack[this.index];
+    return this.curr.data;
   }
 }

@@ -58,7 +58,7 @@ function App() {
       >
         Stop Server
       </button>
-      <input type="number" min={49152} max={65535} value={port} name="" id="" onChange={({ target }) => setPort(Number(target.value))} />
+      <input type="number" min={49152} max={65535} value={port} onChange={({ target }) => setPort(Number(target.value))} />
       {displayServerLink()}
     </div>
   );

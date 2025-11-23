@@ -6,12 +6,13 @@ import { BrowserHistory } from "./utils/BrowserHistory";
 
 function App() {
   const [entries, setEntries] = useState<IEntry[]>([]);
-  const [path, setPath] = useState<string | null>(null);
-  const historyRef = useRef(new BrowserHistory());
+  const [path, setPath] = useState<string>("/");
+  const historyRef = useRef(new BrowserHistory("/"));
   const browserHistory = historyRef.current;
 
   async function fetchEntries() {
-    const url = path != null ? `/entries?path=${encodeURIComponent(path)}` : "/entries";
+    const url = path != "/" ? `/entries?path=${encodeURIComponent(path)}` : "/entries";
+    console.log(path);
     let { data } = await axios.get<IEntry[]>(url);
     setEntries(data);
   }
@@ -50,8 +51,8 @@ function App() {
     <>
       <div>
         <p>Caminho atual: {path}</p>
-        <button onClick={() => setPath(browserHistory.back())}>Voltar</button>
-        <button onClick={() => setPath(browserHistory.forward())}>Frente</button>
+        <button onClick={() => setPath(browserHistory.back(1))}>Voltar</button>
+        <button onClick={() => setPath(browserHistory.forward(1))}>Frente</button>
         <div>{renderEntryList()}</div>
       </div>
     </>
