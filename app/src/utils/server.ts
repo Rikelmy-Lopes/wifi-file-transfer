@@ -1,7 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 
-export async function startServer() {
-  const port = 1234;
+export async function startServer(port: number) {
   await invoke("start_server", { port });
 }
 

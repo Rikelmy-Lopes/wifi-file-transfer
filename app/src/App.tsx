@@ -4,9 +4,18 @@ import { startServer, stopServer } from "./utils/server";
 import { AppState, getAppState } from "./state/appState";
 
 function App() {
+  const [port, setPort] = useState(49152);
   const [appState, setAppState] = useState<AppState | null>(null);
   const [isServerRunning, setIsServerRunning] = useState(false);
 
+  function onStartServer() {
+    const MIN_PORT = 49152;
+    const MAX_PORT = 65535;
+    if (port < MIN_PORT || port > MAX_PORT) return;
+
+    startServer(port);
+    setIsServerRunning(true);
+  }
   function displayServerLink() {
     if (!isServerRunning) {
       return null;
@@ -37,13 +46,7 @@ function App() {
 
   return (
     <div className="container">
-      <button
-        onClick={() => {
-          startServer();
-          setIsServerRunning(true);
-        }}
-        disabled={isServerRunning}
-      >
+      <button onClick={onStartServer} disabled={isServerRunning}>
         Start Server
       </button>
       <button
@@ -55,6 +58,7 @@ function App() {
       >
         Stop Server
       </button>
+      <input type="number" min={49152} max={65535} value={port} name="" id="" onChange={({ target }) => setPort(Number(target.value))} />
       {displayServerLink()}
     </div>
   );
