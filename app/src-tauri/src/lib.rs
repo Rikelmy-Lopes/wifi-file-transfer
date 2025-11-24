@@ -3,7 +3,7 @@ mod fs;
 mod http;
 mod state;
 mod utils;
-use std::{path::PathBuf, sync::Mutex};
+use std::{env, path::PathBuf, sync::Mutex};
 
 use http::server::{start_server, stop_server};
 use state::app_state::get_state;
@@ -11,7 +11,7 @@ use tauri::Manager;
 use utils::os::get_current_ip;
 
 use crate::{
-    constants::constants::WEBAPP_RESOURCE_PATH, state::app_state::AppState,
+    constants::constants::WEBAPP_RESOURCE_PATH_PROD, state::app_state::AppState,
     utils::resource::resolve_resource_path,
 };
 
@@ -20,7 +20,8 @@ pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
             let webapp_path =
-                resolve_resource_path(app.handle(), &PathBuf::from(WEBAPP_RESOURCE_PATH)).unwrap();
+                resolve_resource_path(app.handle(), &PathBuf::from(WEBAPP_RESOURCE_PATH_PROD))
+                    .unwrap();
 
             let state = Mutex::new(AppState {
                 webapp_path,

@@ -1,6 +1,6 @@
-use crate::http::routes::set_routes;
 use crate::state::app_state::AppState;
 use crate::utils::os::get_current_ip;
+use crate::{http::routes::set_routes, utils::resource::get_webapp_path};
 
 use axum::http::StatusCode;
 use axum::routing::get_service;
@@ -24,10 +24,7 @@ pub async fn start_server(app: AppHandle, port: u64) -> () {
 
     *STOP_TX.lock().unwrap() = Some(tx);
 
-    let webapp_path = {
-        let state = state.lock().unwrap();
-        state.webapp_path.clone()
-    };
+    let webapp_path = get_webapp_path(&state);
 
     let router = set_routes().fallback_service(
         get_service(ServeDir::new(webapp_path))
