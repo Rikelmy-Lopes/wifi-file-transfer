@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build:no-typecheck": "vite build",
+    "dev:build:no-typecheck": "vite build --mode development",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },

@@ -1,12 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
-const isDev = process.env.NODE_ENV === "development";
-// https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   build: {
-    outDir: isDev ? "./webapp" : "../src-tauri/resources/webapp",
+    // change the output if is running on development mode, because changes inside the 'resources' folder cause the program to restart...
+    outDir: mode === "development" ? "./webapp" : "../src-tauri/resources/webapp",
     emptyOutDir: true,
   },
-});
+}));
