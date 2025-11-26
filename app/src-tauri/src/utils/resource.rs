@@ -1,28 +1,26 @@
 use std::fs;
 use std::path::PathBuf;
-use std::sync::Mutex;
 use tauri::{path::BaseDirectory, AppHandle};
-use tauri::{Manager, State};
+use tauri::{App, Manager};
 
-use crate::constants::constants::WEBAPP_RESOURCE_PATH_DEV;
-use crate::state::app_state::AppState;
+use crate::constants::constants::{WEBAPP_RESOURCE_PATH_DEV, WEBAPP_RESOURCE_PATH_PROD};
 
-pub fn resolve_resource_path(handle: &AppHandle, path: &PathBuf) -> Option<String> {
-    match handle.path().resolve(path, BaseDirectory::Resource) {
+pub fn resolve_resource_path(handle: &AppHandle, path: &str) -> Option<String> {
+    match handle
+        .path()
+        .resolve(PathBuf::from(path), BaseDirectory::Resource)
+    {
         Ok(path) => Some(path.display().to_string()),
         Err(e) => {
-            let error_message = format!(
-                "Falha ao resolver caminho do recurso: {}\n{}",
-                path.display().to_string(),
-                e
-            );
+            let error_message = format!("Falha ao resolver caminho do recurso: {}\n{}", path, e);
             println!("{}", error_message);
             None
         }
     }
 }
 
-pub fn get_webapp_path(state: &State<'_, Mutex<AppState>>) -> String {
+pub fn get_webapp_path(app: &App) -> String {
+    // Adjust output path in development to avoid restarts caused by changes in 'resources'
     if cfg!(debug_assertions) {
         let absolute_path = fs::canonicalize(WEBAPP_RESOURCE_PATH_DEV)
             .unwrap()
@@ -31,7 +29,6 @@ pub fn get_webapp_path(state: &State<'_, Mutex<AppState>>) -> String {
             .to_string();
         String::from(absolute_path)
     } else {
-        let state = state.lock().unwrap();
-        state.webapp_path.clone()
+        resolve_resource_path(app.handle(), WEBAPP_RESOURCE_PATH_PROD).unwrap()
     }
 }
