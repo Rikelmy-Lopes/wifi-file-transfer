@@ -9,11 +9,7 @@ const env = { ...process.env, NODE_ENV: "development" };
   let child;
   let timeout;
 
-  try {
-    await access(WEBAPP_RES_PATH_DEV);
-  } catch (_) {
-    spawn("npm", ["run", "dev:build:no-typecheck"], { shell: true, stdio: "inherit", cwd: WEBUI_PATH, env });
-  }
+  spawn("npm", ["run", "dev"], { shell: true, stdio: "inherit", cwd: WEBUI_PATH, env });
 
   spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: APP_PATH, env });
 

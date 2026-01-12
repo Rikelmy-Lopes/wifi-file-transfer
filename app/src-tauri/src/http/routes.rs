@@ -1,16 +1,19 @@
+use crate::constants::constants::WEBAPP_RESOURCE_PATH_PROD;
 use crate::fs::fs::{get_dir_entries, get_file_name};
 use axum::extract::Query;
 use axum::http::{header, HeaderValue, StatusCode};
 use axum::response::IntoResponse;
-use axum::routing::get;
+use axum::routing::{get, get_service};
 use axum::Router;
 use axum_extra::headers::Range;
 use axum_extra::TypedHeader;
 use axum_range::{KnownSize, Ranged};
+use axum_reverse_proxy::ReverseProxy;
 use std::collections::HashMap;
 use std::env::home_dir;
 use std::path::PathBuf;
 use tokio::fs::File;
+use tower_http::services::ServeDir;
 
 type RangeDownload = Option<TypedHeader<Range>>;
 type QueryParams = Query<HashMap<String, String>>;
@@ -77,7 +80,20 @@ async fn download(range: RangeDownload, Query(params): QueryParams) -> impl Into
 }
 
 pub fn set_routes() -> Router<()> {
-    Router::new()
-        .route("/download", get(download))
+    let app: Router = get_router();
+    app.route("/download", get(download))
         .route("/entries", get(get_entries))
+}
+
+fn get_router() -> Router<()> {
+    if cfg!(debug_assertions) {
+        let proxy = ReverseProxy::new("/", "http://localhost:5173/");
+        let app: Router = proxy.into();
+        app
+    } else {
+        Router::new().fallback_service(
+            get_service(ServeDir::new(WEBAPP_RESOURCE_PATH_PROD))
+                .handle_error(|_| async { StatusCode::INTERNAL_SERVER_ERROR }),
+        )
+    }
 }
