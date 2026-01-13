@@ -19,7 +19,7 @@ pub fn resolve_resource_path(handle: &AppHandle, path: &str) -> Option<String> {
     }
 }
 
-pub fn get_webapp_path(app: &App) -> String {
+/* pub fn get_webapp_path(app: &App) -> String {
     // Adjust output path in development to avoid restarts caused by changes in 'resources'
     if cfg!(debug_assertions) {
         let absolute_path = fs::canonicalize(WEBAPP_RESOURCE_PATH_DEV)
@@ -31,4 +31,4 @@ pub fn get_webapp_path(app: &App) -> String {
     } else {
         resolve_resource_path(app.handle(), WEBAPP_RESOURCE_PATH_PROD).unwrap()
     }
-}
+} */

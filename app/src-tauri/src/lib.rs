@@ -10,16 +10,15 @@ use state::app_state::get_state;
 use tauri::Manager;
 use utils::os::get_current_ip;
 
-use crate::{state::app_state::AppState, utils::resource::get_webapp_path};
+use crate::state::app_state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let webapp_path = get_webapp_path(&app);
+            /*             let webapp_path = get_webapp_path(&app); */
 
             let state = Mutex::new(AppState {
-                webapp_path,
                 ..AppState::default()
             });
 

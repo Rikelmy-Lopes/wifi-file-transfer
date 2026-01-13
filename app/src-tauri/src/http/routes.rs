@@ -80,14 +80,15 @@ async fn download(range: RangeDownload, Query(params): QueryParams) -> impl Into
 }
 
 pub fn set_routes() -> Router<()> {
-    let app: Router = get_router();
+    let app: Router = create_router();
+
     app.route("/download", get(download))
         .route("/entries", get(get_entries))
 }
 
-fn get_router() -> Router<()> {
+fn create_router() -> Router<()> {
     if cfg!(debug_assertions) {
-        let proxy = ReverseProxy::new("/", "http://localhost:5173/");
+        let proxy = ReverseProxy::new("/", "http://localhost:1024/");
         let app: Router = proxy.into();
         app
     } else {

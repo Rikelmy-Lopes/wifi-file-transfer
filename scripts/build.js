@@ -1,4 +1,4 @@
-import { spawn } from "child_process";
+import { spawn } from "node:child_process";
 import { WEBUI_PATH, APP_PATH } from "./constants.js";
 
 (async () => {
