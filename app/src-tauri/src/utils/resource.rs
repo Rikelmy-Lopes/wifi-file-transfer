@@ -1,9 +1,6 @@
-use std::fs;
 use std::path::PathBuf;
+use tauri::Manager;
 use tauri::{path::BaseDirectory, AppHandle};
-use tauri::{App, Manager};
-
-use crate::constants::constants::{WEBAPP_RESOURCE_PATH_DEV, WEBAPP_RESOURCE_PATH_PROD};
 
 pub fn resolve_resource_path(handle: &AppHandle, path: &str) -> Option<String> {
     match handle
@@ -18,17 +15,3 @@ pub fn resolve_resource_path(handle: &AppHandle, path: &str) -> Option<String> {
         }
     }
 }
-
-/* pub fn get_webapp_path(app: &App) -> String {
-    // Adjust output path in development to avoid restarts caused by changes in 'resources'
-    if cfg!(debug_assertions) {
-        let absolute_path = fs::canonicalize(WEBAPP_RESOURCE_PATH_DEV)
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_string();
-        String::from(absolute_path)
-    } else {
-        resolve_resource_path(app.handle(), WEBAPP_RESOURCE_PATH_PROD).unwrap()
-    }
-} */

@@ -2,20 +2,23 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { startServer, stopServer } from "./utils/server";
 import { AppState, getAppState } from "./state/appState";
+import { blockDevTools } from "./utils/blockDevTools";
+import { MAX_PORT, MIN_PORT } from "./constants/app";
 
 function App() {
-  const [port, setPort] = useState(49152);
+  const [port, setPort] = useState(MIN_PORT);
   const [appState, setAppState] = useState<AppState | null>(null);
   const [isServerRunning, setIsServerRunning] = useState(false);
+  blockDevTools();
 
   function onStartServer() {
-    const MIN_PORT = 49152;
-    const MAX_PORT = 65535;
-    if (port < MIN_PORT || port > MAX_PORT) return;
+    if (isServerRunning) return;
+    if (!isPortInRange(port)) return;
 
     startServer(port);
     setIsServerRunning(true);
   }
+
   function displayServerLink() {
     if (!isServerRunning) {
       return null;
@@ -37,6 +40,17 @@ function App() {
     );
   }
 
+  function validatePort(port: string) {
+    const REGEX_ONLY_NUMBERS = /^[0-9]*$/;
+    if (REGEX_ONLY_NUMBERS.test(port)) {
+      setPort(Number(port));
+    }
+  }
+
+  function isPortInRange(port: number) {
+    return port >= MIN_PORT && port <= MAX_PORT;
+  }
+
   useEffect(() => {
     (async () => {
       const state = await getAppState();
@@ -46,7 +60,7 @@ function App() {
 
   return (
     <div className="container">
-      <button onClick={onStartServer} disabled={isServerRunning}>
+      <button onClick={onStartServer} disabled={isServerRunning || !isPortInRange(port)}>
         Start Server
       </button>
       <button
@@ -58,7 +72,7 @@ function App() {
       >
         Stop Server
       </button>
-      <input type="number" min={49152} max={65535} value={port} onChange={({ target }) => setPort(Number(target.value))} />
+      <input type="text" value={port} onChange={({ target }) => validatePort(target.value)} />
       {displayServerLink()}
     </div>
   );

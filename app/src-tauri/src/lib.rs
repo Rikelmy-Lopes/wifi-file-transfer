@@ -16,8 +16,6 @@ use crate::state::app_state::AppState;
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            /*             let webapp_path = get_webapp_path(&app); */
-
             let state = Mutex::new(AppState {
                 ..AppState::default()
             });

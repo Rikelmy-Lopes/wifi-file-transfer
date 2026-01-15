@@ -1,6 +1,5 @@
-use crate::http::routes::set_routes;
-use crate::state::app_state::AppState;
 use crate::utils::os::get_current_ip;
+use crate::{http::routes::routes::set_routes, state::app_state::AppState};
 
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
@@ -21,12 +20,7 @@ pub async fn start_server(app: AppHandle, port: u64) -> () {
 
     *STOP_TX.lock().unwrap() = Some(tx);
 
-    /*     let webapp_path = {
-        let state_lock = state.lock().unwrap();
-        state_lock.webapp_path.clone()
-    }; */
-
-    let router = set_routes();
+    let router = set_routes(&app);
 
     let addr = format!("{}:{}", state.lock().unwrap().server_ip, port);
 
