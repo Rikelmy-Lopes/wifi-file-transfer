@@ -32,7 +32,7 @@ function App() {
 
     return (
       <div>
-        <span>Server running on: </span>
+        <span>Servidor rodando em: </span>
         <a href={link} target="_blank">
           {link}
         </a>

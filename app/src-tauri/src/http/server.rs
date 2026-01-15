@@ -11,6 +11,7 @@ static STOP_TX: Lazy<Mutex<Option<oneshot::Sender<()>>>> = Lazy::new(|| Mutex::n
 #[tauri::command(async)]
 pub async fn start_server(app: AppHandle, port: u64) -> () {
     let (tx, rx) = oneshot::channel::<()>();
+
     let state = app.state::<Mutex<AppState>>();
     {
         let mut guard = state.lock().unwrap();
