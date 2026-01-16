@@ -1,13 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 
-export const startServer = () => {
-  invoke("start_server", { port: 1234 });
-};
+export async function startServer(port: number) {
+  await invoke("start_server", { port });
+}
 
-export const stopServer = async () => {
-  invoke("stop_server");
-};
+export async function stopServer() {
+  await invoke("stop_server");
+}
 
-export const getIp = async () => {
-  return (await invoke("get_current_ip")) as String;
-};
+export async function getIp() {
+  return (await invoke("get_current_ip")) as string;
+}

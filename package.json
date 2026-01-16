@@ -5,9 +5,13 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "install": "node ./script/install.js",
-    "dev:all": "node ./script/devAll.js",
-    "clean:all": "node ./script/cleanAll.js"
+    "install": "node ./scripts/install.js",
+    "dev": "node ./scripts/dev.js",
+    "build": "node ./scripts/build.js",
+    "clean:node": "node ./scripts/clean/cleanNode.js",
+    "clean:dist": "node ./scripts/clean/cleanDist.js",
+    "clean:rust": "node ./scripts/clean/cleanRust.js",
+    "clean:all": "npm run clean:node && npm run clean:dist && npm run clean:rust"
   },
   "author": "",
   "license": "MIT"

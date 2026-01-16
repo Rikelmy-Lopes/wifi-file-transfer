@@ -1,10 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 
-// https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(() => ({
   plugins: [react()],
-  build: {
-    outDir: "webapp",
+  server: {
+    port: 1024,
+    strictPort: true,
+    host: "127.0.0.1",
   },
-});
+  build: {
+    outDir: "../src-tauri/resources/webapp",
+    emptyOutDir: true,
+  },
+}));
