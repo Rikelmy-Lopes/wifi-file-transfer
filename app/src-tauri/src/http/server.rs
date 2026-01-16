@@ -9,7 +9,7 @@ use tokio::sync::oneshot;
 static STOP_TX: Lazy<Mutex<Option<oneshot::Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
 #[tauri::command(async)]
-pub async fn start_server(app: AppHandle, port: u64) -> () {
+pub async fn start_server(app: AppHandle, port: u16) -> () {
     let (tx, rx) = oneshot::channel::<()>();
 
     let state = app.state::<Mutex<AppState>>();

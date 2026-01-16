@@ -6,7 +6,7 @@ use tauri::{AppHandle, Manager};
 #[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
-    pub server_port: u64,
+    pub server_port: u16,
     pub server_ip: String,
 }
 
