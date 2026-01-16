@@ -59,22 +59,29 @@ function App() {
   }, [isServerRunning]);
 
   return (
-    <div className="container">
-      <button onClick={onStartServer} disabled={isServerRunning || !isPortInRange(port)}>
-        Start Server
-      </button>
-      <button
-        onClick={() => {
-          stopServer();
-          setIsServerRunning(false);
-        }}
-        disabled={!isServerRunning}
-      >
-        Stop Server
-      </button>
-      <input type="text" value={port} onChange={({ target }) => validatePort(target.value)} />
-      {displayServerLink()}
-    </div>
+    <main>
+      <div className="container">
+        <button onClick={onStartServer} disabled={isServerRunning || !isPortInRange(port)}>
+          Start Server
+        </button>
+        <button
+          onClick={() => {
+            stopServer();
+            setIsServerRunning(false);
+          }}
+          disabled={!isServerRunning}
+        >
+          Stop Server
+        </button>
+        <input
+          type="text"
+          value={port}
+          onChange={({ target }) => validatePort(target.value)}
+          disabled={isServerRunning}
+        />
+        {displayServerLink()}
+      </div>
+    </main>
   );
 }
 
