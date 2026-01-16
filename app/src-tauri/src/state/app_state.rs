@@ -8,7 +8,6 @@ use tauri::{AppHandle, Manager};
 pub struct AppState {
     pub server_port: u64,
     pub server_ip: String,
-    pub webapp_path: String,
 }
 
 #[tauri::command]
