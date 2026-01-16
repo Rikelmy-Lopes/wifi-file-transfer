@@ -1,20 +1,17 @@
-use crate::http::routes::set_routes;
-use crate::state::app_state::AppState;
 use crate::utils::os::get_current_ip;
+use crate::{api::routes::routes::set_routes, state::app_state::AppState};
 
-use axum::http::StatusCode;
-use axum::routing::get_service;
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager};
 use tokio::sync::oneshot;
-use tower_http::services::ServeDir;
 
 static STOP_TX: Lazy<Mutex<Option<oneshot::Sender<()>>>> = Lazy::new(|| Mutex::new(None));
 
 #[tauri::command(async)]
-pub async fn start_server(app: AppHandle, port: u64) -> () {
+pub async fn start_server(app: AppHandle, port: u16) -> () {
     let (tx, rx) = oneshot::channel::<()>();
+
     let state = app.state::<Mutex<AppState>>();
     {
         let mut guard = state.lock().unwrap();
@@ -24,15 +21,7 @@ pub async fn start_server(app: AppHandle, port: u64) -> () {
 
     *STOP_TX.lock().unwrap() = Some(tx);
 
-    let webapp_path = {
-        let state = state.lock().unwrap();
-        state.webapp_path.clone()
-    };
-
-    let router = set_routes().fallback_service(
-        get_service(ServeDir::new(webapp_path))
-            .handle_error(|_| async { StatusCode::INTERNAL_SERVER_ERROR }),
-    );
+    let router = set_routes(&app);
 
     let addr = format!("{}:{}", state.lock().unwrap().server_ip, port);
 

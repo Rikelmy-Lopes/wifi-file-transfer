@@ -1,28 +1,29 @@
-import { spawn } from "child_process";
-import { watch, access } from "fs/promises";
-import { WEBAPP_RES_PATH, APP_PATH, WEBUI_PATH, WEBUI_SRC_PATH  } from "./constants.js";
-const DELAY = 500;
+import { spawn } from "node:child_process";
+import { APP_PATH, WEBAPP_RES_PATH_PROD, WEBUI_PATH } from "./constants.js";
+import { killAll } from "./process.js";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 (async () => {
-  let child;
-  let timeout;
-
-  try {
-    await access(WEBAPP_RES_PATH);
-  } catch (_) {
-    spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: WEBUI_PATH });
+  // this folders need to exist to run in development mode
+  if (!existsSync(WEBAPP_RES_PATH_PROD)) {
+    mkdirSync(WEBAPP_RES_PATH_PROD, { recursive: true });
+    writeFileSync(join(WEBAPP_RES_PATH_PROD, "index.html"), "");
   }
-  
+
   spawn("npm", ["run", "tauri", "dev"], { shell: true, stdio: "inherit", cwd: APP_PATH });
 
-  let watcher = watch(WEBUI_SRC_PATH, { recursive: true });
+  let child = spawn("npm", ["run", "dev"], { shell: true, cwd: WEBUI_PATH });
 
-  for await (const _ of watcher) {
-    clearTimeout(timeout);
+  child.stderr.setEncoding("utf-8");
+  child.stdout.setEncoding("utf-8");
 
-    timeout = setTimeout(() => {
-      if (child && !child.killed) child.kill();
-      child = spawn("npm", ["run", "build:no-typecheck"], { shell: true, stdio: "inherit", cwd: WEBUI_PATH });
-    }, DELAY);
-  }
+  child.stdout.pipe(process.stdout);
+
+  child.stderr.on("data", (data) => {
+    console.error(data);
+    if (data.includes("Port") && data.includes("is already in use")) {
+      killAll(process.pid);
+    }
+  });
 })();
