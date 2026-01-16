@@ -1,4 +1,4 @@
-function Config() {
+function Configuration() {
   return (
     <div>
       <h1>Rota de Configuração</h1>
@@ -6,4 +6,4 @@ function Config() {
   );
 }
 
-export default Config;
+export default Configuration;

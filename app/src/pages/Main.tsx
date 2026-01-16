@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { startServer, stopServer } from "../utils/server";
 import { AppState, getAppState } from "../state/appState";
 import { blockDevTools } from "../utils/blockDevTools";
-import { MAX_PORT, MIN_PORT } from "../constants/app";
+import { MIN_PORT } from "../constants/app";
 import { createWebviewWindow } from "../utils/window";
+import { isPortInRange } from "../utils/utils";
 
 function Main() {
   const [port, setPort] = useState(MIN_PORT);
@@ -46,10 +47,6 @@ function Main() {
     if (REGEX_ONLY_NUMBERS.test(port)) {
       setPort(Number(port));
     }
-  }
-
-  function isPortInRange(port: number) {
-    return port >= MIN_PORT && port <= MAX_PORT;
   }
 
   useEffect(() => {
