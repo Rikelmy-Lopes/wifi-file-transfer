@@ -1,11 +1,11 @@
+mod api;
 mod constants;
 mod fs;
-mod http;
 mod state;
 mod utils;
 use std::{env, sync::Mutex};
 
-use http::server::{start_server, stop_server};
+use api::server::{start_server, stop_server};
 use state::app_state::get_state;
 use tauri::Manager;
 use utils::os::get_current_ip;

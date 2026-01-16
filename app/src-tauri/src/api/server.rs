@@ -1,5 +1,5 @@
 use crate::utils::os::get_current_ip;
-use crate::{http::routes::routes::set_routes, state::app_state::AppState};
+use crate::{api::routes::routes::set_routes, state::app_state::AppState};
 
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
