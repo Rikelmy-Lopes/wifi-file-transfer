@@ -75,12 +75,12 @@ function App() {
         </button>
         <input
           type="text"
-          value={port}
+          value={port ? port : ""}
           onChange={({ target }) => validatePort(target.value)}
           disabled={isServerRunning}
         />
-        {displayServerLink()}
       </div>
+      {displayServerLink()}
     </main>
   );
 }
