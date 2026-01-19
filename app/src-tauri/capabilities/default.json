@@ -10,6 +10,19 @@
     "core:webview:allow-create-webview",
     "core:webview:allow-webview-show",
     "core:webview:allow-set-webview-size",
-    "core:window:allow-set-min-size"
+    "core:window:allow-set-min-size",
+    "fs:default",
+    {
+      "identifier": "fs:allow-app-write",
+      "allow": ["$APPLOCALDATA/*/**"]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": ["$APPLOCALDATA/*/**"]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": ["$APPLOCALDATA/*/**"]
+    }
   ]
 }

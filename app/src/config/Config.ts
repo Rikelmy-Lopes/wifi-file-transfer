@@ -3,24 +3,23 @@ import { isPortInRange } from "../utils/utils";
 
 export interface IConfig {
   serverPort: number;
-  serverPassword: string;
 }
 
 export class Config {
   private serverPort: number = MIN_PORT;
-  private serverPassword: string = "";
 
-  constructor(config: string) {
-    const parsedConfig = JSON.parse(config) as IConfig;
-    this.setServerPort(parsedConfig.serverPort);
-    this.setServerPassword(parsedConfig.serverPassword);
+  constructor(config?: string) {
+    if (config) {
+      const parsedConfig = JSON.parse(config) as IConfig;
+      this.setServerPort(parsedConfig.serverPort);
+    }
   }
 
-  getServerPort() {
+  public getServerPort() {
     return this.serverPort;
   }
 
-  setServerPort(port: number): Config {
+  public setServerPort(port: number): Config {
     if (!isPortInRange(port)) {
       throw new RangeError(`Port must be between ${MIN_PORT} and ${MAX_PORT}`);
     }
@@ -29,12 +28,7 @@ export class Config {
     return this;
   }
 
-  getServerPassword() {
-    return this.serverPassword;
-  }
-
-  setServerPassword(serverPassword: string): Config {
-    this.serverPassword = serverPassword;
-    return this;
+  public toString() {
+    return JSON.stringify(this);
   }
 }

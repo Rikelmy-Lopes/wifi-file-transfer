@@ -3,8 +3,9 @@ import { startServer, stopServer } from "../utils/server";
 import { AppState, getAppState } from "../state/appState";
 import { blockDevTools } from "../utils/blockDevTools";
 import { MIN_PORT } from "../constants/app";
-import { createWebviewWindow } from "../utils/window";
+/* import { createWebviewWindow } from "../utils/window"; */
 import { isPortInRange } from "../utils/utils";
+import { configManager } from "../config/ConfigManager";
 
 function Main() {
   const [port, setPort] = useState(MIN_PORT);
@@ -13,9 +14,11 @@ function Main() {
   blockDevTools();
 
   async function onStartServer() {
-    const [configWindow, configWebview] = await createWebviewWindow("/config", "Configuração", "teste");
     if (isServerRunning) return;
     if (!isPortInRange(port)) return;
+
+    const config = await configManager.load();
+    configManager.save(config.setServerPort(port));
 
     startServer(port);
     setIsServerRunning(true);
@@ -55,6 +58,13 @@ function Main() {
       setAppState(state);
     })();
   }, [isServerRunning]);
+
+  useEffect(() => {
+    (async () => {
+      const config = await configManager.load();
+      setPort(config.getServerPort());
+    })();
+  }, []);
 
   return (
     <>
