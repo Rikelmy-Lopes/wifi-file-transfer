@@ -22,7 +22,7 @@ export function createWebviewWindow(path: string, title: string, id: string): Pr
     });
 
     window.once("tauri://created", async function () {
-      const webview = new Webview(window, id + "Webview", {
+      const webview = new Webview(window, id, {
         url: path,
         x: DEFAULT_WINDOW_POSITION_X,
         y: DEFAULT_WINDOW_POSITION_Y,

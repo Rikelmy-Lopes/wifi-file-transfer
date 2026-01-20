@@ -2,25 +2,19 @@ import { useEffect, useState } from "react";
 import { startServer, stopServer } from "../utils/server";
 import { AppState, getAppState } from "../state/appState";
 import { blockDevTools } from "../utils/blockDevTools";
-import { MIN_PORT } from "../constants/app";
-/* import { createWebviewWindow } from "../utils/window"; */
-import { isPortInRange } from "../utils/utils";
 import { configManager } from "../config/ConfigManager";
+import { createWebviewWindow } from "../utils/window";
 
 function Main() {
-  const [port, setPort] = useState(MIN_PORT);
   const [appState, setAppState] = useState<AppState | null>(null);
   const [isServerRunning, setIsServerRunning] = useState(false);
   blockDevTools();
 
   async function onStartServer() {
     if (isServerRunning) return;
-    if (!isPortInRange(port)) return;
+    const config = await configManager.getCurrent();
 
-    const config = await configManager.load();
-    configManager.save(config.setServerPort(port));
-
-    startServer(port);
+    startServer(config.getServerPort());
     setIsServerRunning(true);
   }
 
@@ -45,11 +39,9 @@ function Main() {
     );
   }
 
-  function validatePort(port: string) {
-    const REGEX_ONLY_NUMBERS = /^[0-9]*$/;
-    if (REGEX_ONLY_NUMBERS.test(port)) {
-      setPort(Number(port));
-    }
+  async function openConfig() {
+    const [_window, webview] = await createWebviewWindow("/config", "Configuração", "config");
+    webview.show();
   }
 
   useEffect(() => {
@@ -61,16 +53,15 @@ function Main() {
 
   useEffect(() => {
     (async () => {
-      const config = await configManager.load();
-      setPort(config.getServerPort());
+      await configManager.load();
     })();
   }, []);
 
   return (
     <>
       <div className="container">
-        <button onClick={onStartServer} disabled={isServerRunning || !isPortInRange(port)}>
-          Start Server
+        <button onClick={onStartServer} disabled={isServerRunning}>
+          Iniciar Servidor
         </button>
         <button
           onClick={() => {
@@ -79,14 +70,11 @@ function Main() {
           }}
           disabled={!isServerRunning}
         >
-          Stop Server
+          Parar Servidor
         </button>
-        <input
-          type="text"
-          value={port ? port : ""}
-          onChange={({ target }) => validatePort(target.value)}
-          disabled={isServerRunning}
-        />
+        <button onClick={openConfig} disabled={isServerRunning}>
+          Configuração
+        </button>
       </div>
       {displayServerLink()}
     </>
