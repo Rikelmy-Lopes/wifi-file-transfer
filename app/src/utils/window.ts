@@ -4,6 +4,7 @@ import {
   DEFAULT_WINDOW_POSITION_X,
   DEFAULT_WINDOW_POSITION_Y,
   DEFAULT_WINDOW_WIDTH,
+  MAIN_WINDOW_NAME,
   MIN_WINDOW_HEIGHT,
   MIN_WINDOW_WIDTH,
 } from "../constants/app";
@@ -43,7 +44,7 @@ export async function createWebviewWindow(path: string, title: string, id: strin
 
 export async function onMainWindowClose() {
   const window = getCurrentWebviewWindow();
-  if (window.label === "main") {
+  if (window.label === MAIN_WINDOW_NAME) {
     window.onCloseRequested(async () => {
       const windows = await getAllWebviewWindows();
       for (const win of windows) {

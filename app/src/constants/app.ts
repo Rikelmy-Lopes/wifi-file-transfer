@@ -6,3 +6,4 @@ export const MIN_WINDOW_WIDTH = 400;
 export const MIN_WINDOW_HEIGHT = 300;
 export const DEFAULT_WINDOW_POSITION_X = 0;
 export const DEFAULT_WINDOW_POSITION_Y = 0;
+export const MAIN_WINDOW_NAME = "main";
