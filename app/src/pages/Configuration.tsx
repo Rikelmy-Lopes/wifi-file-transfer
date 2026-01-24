@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
-import { blockDevTools } from "../utils/blockDevTools";
 import { MIN_PORT } from "../constants/app";
 import { configManager } from "../config/ConfigManager";
 import { isPortInRange } from "../utils/utils";
 
 function Configuration() {
   const [port, setPort] = useState(MIN_PORT);
-  blockDevTools();
 
   function validatePort(port: string) {
     const REGEX_ONLY_NUMBERS = /^[0-9]*$/;

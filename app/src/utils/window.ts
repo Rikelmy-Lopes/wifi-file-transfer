@@ -1,5 +1,4 @@
-import { Webview } from "@tauri-apps/api/webview";
-import { PhysicalSize, Window } from "@tauri-apps/api/window";
+import { currentMonitor, PhysicalSize } from "@tauri-apps/api/window";
 import {
   DEFAULT_WINDOW_HEIGHT,
   DEFAULT_WINDOW_POSITION_X,
@@ -8,43 +7,48 @@ import {
   MIN_WINDOW_HEIGHT,
   MIN_WINDOW_WIDTH,
 } from "../constants/app";
+import { getAllWebviewWindows, getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-export function createWebviewWindow(path: string, title: string, id: string): Promise<[Window, Webview]> {
+export async function createWebviewWindow(path: string, title: string, id: string): Promise<WebviewWindow> {
   const minSize = new PhysicalSize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
+  const monitor = await currentMonitor();
+  let x: number = DEFAULT_WINDOW_POSITION_X;
+  let y: number = DEFAULT_WINDOW_POSITION_Y;
+
+  if (monitor) {
+    x = monitor.size.width / 2 - DEFAULT_WINDOW_WIDTH / 2;
+    y = monitor.size.height / 2 - DEFAULT_WINDOW_HEIGHT / 2;
+  }
 
   return new Promise((resolve, reject) => {
-    const window = new Window(id, {
-      x: DEFAULT_WINDOW_POSITION_X,
-      y: DEFAULT_WINDOW_POSITION_Y,
+    const webviewWindow = new WebviewWindow(id, {
+      x,
+      y,
       width: DEFAULT_WINDOW_WIDTH,
       height: DEFAULT_WINDOW_HEIGHT,
       title,
+      url: path,
     });
 
-    window.once("tauri://created", async function () {
-      const webview = new Webview(window, id, {
-        url: path,
-        x: DEFAULT_WINDOW_POSITION_X,
-        y: DEFAULT_WINDOW_POSITION_Y,
-        width: DEFAULT_WINDOW_WIDTH,
-        height: DEFAULT_WINDOW_HEIGHT,
-      });
-
-      webview.once("tauri://error", function (e) {
-        reject(e);
-      });
-
-      window.onResized(async ({ payload: size }) => {
-        await webview.setSize(size);
-      });
-
-      window.setMinSize(minSize);
-
-      resolve([window, webview]);
-    });
-
-    window.once("tauri://error", function (e) {
+    webviewWindow.once("tauri://error", function (e) {
       reject(e);
     });
+
+    webviewWindow.once("tauri://window-created", async () => {
+      await webviewWindow.setMinSize(minSize);
+      resolve(webviewWindow);
+    });
   });
+}
+
+export async function onMainWindowClose() {
+  const window = getCurrentWebviewWindow();
+  if (window.label === "main") {
+    window.onCloseRequested(async () => {
+      const windows = await getAllWebviewWindows();
+      for (const win of windows) {
+        await win.close();
+      }
+    });
+  }
 }

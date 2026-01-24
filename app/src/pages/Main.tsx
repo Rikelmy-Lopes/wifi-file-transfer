@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { startServer, stopServer } from "../utils/server";
 import { AppState, getAppState } from "../state/appState";
-import { blockDevTools } from "../utils/blockDevTools";
 import { configManager } from "../config/ConfigManager";
 import { createWebviewWindow } from "../utils/window";
 
 function Main() {
   const [appState, setAppState] = useState<AppState | null>(null);
   const [isServerRunning, setIsServerRunning] = useState(false);
-  blockDevTools();
 
   async function onStartServer() {
     if (isServerRunning) return;
@@ -40,8 +38,8 @@ function Main() {
   }
 
   async function openConfig() {
-    const [_window, webview] = await createWebviewWindow("/config", "Configuração", "config");
-    webview.show();
+    const window = await createWebviewWindow("/config", "Configuração", "config");
+    await window.show();
   }
 
   useEffect(() => {

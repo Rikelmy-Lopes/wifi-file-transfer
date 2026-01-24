@@ -4,11 +4,11 @@ import { emit, listen } from "@tauri-apps/api/event";
 
 class ConfigManager {
   private static instance: ConfigManager | null = null;
-  private current: Config | null = null;
   private readonly BASE_DIR: BaseDirectory;
   private readonly CONFIG_FOLDER_PATH = "config";
   private readonly CONFIG_FILE_PATH = `${this.CONFIG_FOLDER_PATH}/config.json`;
   private readonly SYNC_EVENT = "config-changed";
+  private current: Config | null = null;
 
   private constructor(baseDir: BaseDirectory) {
     this.BASE_DIR = baseDir;
