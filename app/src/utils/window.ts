@@ -10,25 +10,26 @@ import {
 } from "../constants/app";
 import { getAllWebviewWindows, getCurrentWebviewWindow, WebviewWindow } from "@tauri-apps/api/webviewWindow";
 
-export async function createWebviewWindow(path: string, title: string, id: string): Promise<WebviewWindow> {
+export async function createWebviewWindow(url: string, title: string, label: string): Promise<WebviewWindow> {
   const minSize = new PhysicalSize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
   const monitor = await currentMonitor();
   let x: number = DEFAULT_WINDOW_POSITION_X;
   let y: number = DEFAULT_WINDOW_POSITION_Y;
 
+  // center the window on the middle
   if (monitor) {
     x = monitor.size.width / 2 - DEFAULT_WINDOW_WIDTH / 2;
     y = monitor.size.height / 2 - DEFAULT_WINDOW_HEIGHT / 2;
   }
 
   return new Promise((resolve, reject) => {
-    const webviewWindow = new WebviewWindow(id, {
+    const webviewWindow = new WebviewWindow(label, {
       x,
       y,
       width: DEFAULT_WINDOW_WIDTH,
       height: DEFAULT_WINDOW_HEIGHT,
       title,
-      url: path,
+      url,
     });
 
     webviewWindow.once("tauri://error", function (e) {
@@ -45,7 +46,7 @@ export async function createWebviewWindow(path: string, title: string, id: strin
 export async function onMainWindowClose() {
   const window = getCurrentWebviewWindow();
   if (window.label === MAIN_WINDOW_NAME) {
-    window.onCloseRequested(async () => {
+    await window.onCloseRequested(async () => {
       const windows = await getAllWebviewWindows();
       for (const win of windows) {
         await win.close();
