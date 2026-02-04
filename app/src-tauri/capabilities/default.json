@@ -2,11 +2,28 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": [
-    "main"
-  ],
+  "windows": ["main", "config"],
   "permissions": [
     "core:default",
-    "opener:default"
+    "opener:default",
+    "core:webview:allow-set-webview-size",
+    "core:window:allow-set-min-size",
+    "core:window:allow-show",
+    "core:webview:allow-create-webview-window",
+    "core:window:allow-close",
+    "core:window:allow-destroy",
+    "fs:default",
+    {
+      "identifier": "fs:allow-app-write",
+      "allow": ["$APPLOCALDATA/*/**"]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": ["$APPLOCALDATA/*/**"]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": ["$APPLOCALDATA/*/**"]
+    }
   ]
 }
