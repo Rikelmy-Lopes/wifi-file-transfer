@@ -4,7 +4,7 @@ import { killAll } from "./process.js";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-(async () => {
+(() => {
   // this folders need to exist to run in development mode
   if (!existsSync(WEBAPP_RES_PATH_PROD)) {
     mkdirSync(WEBAPP_RES_PATH_PROD, { recursive: true });
